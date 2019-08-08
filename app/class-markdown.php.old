@@ -1,0 +1,130 @@
+<?php
+
+//spl_autoload_register(function($class){
+//	require preg_replace('{\\\\|_(?!.*\\\\)}', DIRECTORY_SEPARATOR, ltrim($class, '\\')).'.php';
+//});
+
+require_once 'Michelf/Markdown.inc.php';
+
+use \Michelf\Markdown;
+
+//include "/Michelf/Markdown.inc.php";
+
+function markdown($text) {
+	# Transform text using parser.
+	return Markdown::defaultTransform($text);
+}
+
+### Smarty Modifier Interface ###
+
+// author: rabbitone
+function replace_marks($text) {
+
+    $matches = array();
+    $mark_regexp = "/\[mark.*\]*/i";
+
+    $text = preg_replace_callback($mark_regexp,
+
+        function($matches) {
+
+            //print_r($matches);
+            //foreach($matches[0] as $mark) {
+            $mark = $matches[0];
+
+            $mark_value = array();
+            $mark_comment = array();
+
+            preg_match("/value=\"(.*?)\"/i", $mark, $mark_value);
+            preg_match("/comment=\"(.*?)\"/i", $mark, $mark_comment);
+            $final_value = "";
+            $final_comment = "";
+
+            if (!empty($mark_value) && !empty($mark_comment) && !empty($mark_value[1]) && !empty($mark_comment[1])) {
+                $final_value = $mark_value[1];
+                $final_comment = markdown($mark_comment[1]);
+            }
+
+            //echo $final_value;
+            //echo $final_comment;
+
+            return '<div class="numblocks"><div class="span-mark">' . $final_value . '</div>' . trim($final_comment) . '</div>';
+        },
+
+        $text);
+
+
+
+/*
+ *
+ *
+ *
+
+        foreach($matches[0] as $mark) {
+
+            $mark_value = array();
+            if (preg_match("/value=\"(.*?)\"/i", $mark, $mark_value)) {
+                //print_r($mark_value);
+            }
+
+            $mark_comment = array();
+            if (preg_match("/comment=\"(.*?)\"/i", $mark, $mark_comment)) {
+                //print_r($mark_comment);
+            }
+
+            $final_value = "";
+            $final_comment = "";
+
+            if (!empty($mark_value) && !empty($mark_comment) && !empty($mark_value[1]) && !empty($mark_comment[1])) {
+                $final_value = $mark_value[1];
+                $final_comment = Markdown($mark_comment[1]);
+            }
+
+            //echo $final_value;
+            //echo $final_comment;
+
+
+        }
+
+
+
+ *
+ */
+
+
+
+    return $text;
+}
+
+
+// modified by rabbitone
+function smarty_modifier_markdown($text) {
+
+    $text = replace_marks($text);
+	return markdown($text);
+}
+
+
+### Textile Compatibility Mode ###
+
+# Rename this file to "classTextile.php" and it can replace Textile everywhere.
+
+if (strcasecmp(substr(__FILE__, -16), "classTextile.php") == 0) {
+	# Try to include PHP SmartyPants. Should be in the same directory.
+	@include_once 'smartypants.php';
+	# Fake Textile class. It calls Markdown instead.
+	class Textile {
+		function TextileThis($text, $lite='', $encode='') {
+			if ($lite == '' && $encode == '')    $text = Markdown($text);
+			if (function_exists('SmartyPants'))  $text = SmartyPants($text);
+			return $text;
+		}
+		# Fake restricted version: restrictions are not supported for now.
+		function TextileRestricted($text, $lite='', $noimage='') {
+			return $this->TextileThis($text, $lite);
+		}
+		# Workaround to ensure compatibility with TextPattern 4.0.3.
+		function blockLite($text) { return $text; }
+	}
+}
+
+

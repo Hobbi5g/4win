@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+  <head>
+    <meta content="text/html; charset=windows-1251" http-equiv="Content-Type" />
+    <title>typografica@pixelapes: Корректор типографики -- Pixel-Apes</title>
+  </head>
+
+ <style id=pageStyle>
+  .br { background: #cccccc }
+  BODY,
+  TD { background:#eeeeee; font:small Times, serif }
+
+  A.tool, A.tool:VISITED { color:#3333dd }
+  .sectionTitle { font-weight:bold }
+  .bonus { color:#666666 }
+ </style>
+
+<script language=Javascript src=scripts.js></script>
+<script language=Javascript src=typografica3.js></script>
+<script language=Javascript>
+function putBack()
+{
+  data = hiddenResult;
+  document.forms["f1"].t_input.innerText = data;
+}
+function copyToClipboard()
+{
+  var _d;
+  _d = ""+document.forms["f1"].t_input.innerText;
+  data = hiddenResult;
+  document.forms["f1"].t_input.innerText = data;
+  document.forms["f1"].t_input.createTextRange().execCommand("Cut");
+  document.forms["f1"].t_input.innerText = _d;
+  document.forms["f1"].processBtn2.title = "скопировано в буфер обмена: \n--------------------------------------\n"+data+"\n--------------------------------------";
+  document.forms["f1"].processBtn2.style.backgroundColor = "#ffee99";
+  setTimeout('document.forms["f1"].processBtn2.style.backgroundColor = "#dddddd"', 100);
+}
+
+function parse( )
+{
+  form = document.forms["f1"];
+  data = " "+document.forms["f1"].t_input.value+" ";
+
+  var s="nothing";
+  // Спец.символы
+  if (form.item0_0.checked) s+=" laquo";
+  if (form.item0_1.checked) s+=" farlaquo";
+  if (form.item0_2.checked) s+=" quotes";
+  if (form.item0_3.checked) s+=" inches";
+  if (form.item0_4.checked) s+=" dash";
+  if (form.item0_5.checked) s+=" emdash";
+  if (form.item0_6.checked) s+=" (c)";
+  if (form.item0_7.checked) s+=" (r)";
+  if (form.item0_8.checked) s+=" (tm)";
+  if (form.item0_9.checked) s+=" (p)";
+  if (form.item0_10.checked) s+=" +-";
+  if (form.item0_11.checked) s+=" degrees";
+  if (form.item0_12.checked) s+=" phones";
+  // Макросы
+  if (form.item1_0.checked) s+=" <//>";
+  if (form.item1_1.checked) s+=" <-->";
+  if (form.item1_2.checked) s+=" mailto";
+  if (form.item1_3.checked) s+=" http";
+  if (form.item1_4.checked) s+=" fixed";
+  // Эвристики
+  if (form.item2_0.checked) s+=" br";
+  if (form.item2_1.checked) s+=" br2";
+  if (form.item2_2.checked) s+=" wordglue";
+  if (form.item2_3.checked) s+=" dashglue";
+  if (form.item2_4.checked) s+=" spacing";
+  if (form.item2_5.checked) s+=" html";
+
+  var typo = new typografica( s );
+  if (form.paragraphAlign.value!="") typo.Pprefix="<p "+form.paragraphAlign.value+">";
+  if (form.skipHTTP.checked) typo.softA = true;
+  if (form.item1_4.checked) typo.FixedSize = 1*form.fixedSize.value;
+
+  data = typo.correct(data);
+
+  document.all["resultTag"].innerHTML = data;
+  hiddenResult = data; 
+
+  form.processBtn1.disabled = false;
+  form.processBtn2.disabled = false;
+
+}
+var hiddenResult;
+</script>
+
+<script language=JavaScript>
+function changeGroup( groupNo )
+{ 
+  for (var i in document.all)
+   if (i.indexOf("item"+groupNo) == 0)
+    document.all[i].checked = document.all["group"+groupNo].checked;
+
+  if (document.forms["f1"].autoApply.checked) parse();
+}
+function changeItem( groupNo, item )
+{ 
+  if (!item.checked) document.all["group"+groupNo].checked = false;
+  else
+  {
+    document.all["group"+groupNo].checked = true;
+    for (var i in document.all)
+     if (i.indexOf("item"+groupNo) == 0)
+      if (!document.all[i].checked)    
+       document.all["group"+groupNo].checked = false;
+  }
+  if (document.forms["f1"].autoApply.checked) parse();
+}
+function checkparse()
+{
+  if (document.forms["f1"].autoClick.checked) parse();
+}
+</script>
+
+
+<body leftmargin=0 topmargin=0 rightmargin=0 bottommargin=0 marginheight=0 marginwidth=0>
+<table cellspacing=15 cellpadding=0 width=100% border=0>
+<form name=f1 id=f1>
+ <tr>
+  <td colspan=3>
+    
+   <table cellspacing=5 cellpadding=0 border=0 width=100% >
+    <tr>
+    
+
+     <td width=34% align=right valign=top>
+      <div align=center class=sectionTitle>
+      <input id=group0 name=group0 
+       type=checkbox onclick="changeGroup(0)"><label for=group0>
+       Спец. символы
+      </label></div>
+      <table align=center cellspacing=0 cellpadding=0 border=0><tr><td nowrap>
+      
+              <input id=item0_0 name=item0_0 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_0>
+               кавычки-ёлочки: &laquo; / &raquo;</label><br>
+              <input id=item0_1 name=item0_1
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_1>
+               ёлочки в FAR: &laquo; / &raquo;</label><br>
+              <input id=item0_2 name=item0_2 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_2>
+               кавычки-лапки: &#147; / &#148;</label><br>
+              <input id=item0_3 name=item0_3 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_3>
+               цифры с дюймами: 15", 3.5"</label><br>
+              <input id=item0_4 name=item0_4 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_4>
+               тире: - / &#0150;</label><br>
+              <input id=item0_5 name=item0_5 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_5>
+               длинное тире: -- / &#0151;</label><br>
+              <input id=item0_6 name=item0_6 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_6>
+               copyright (c)</label><br>
+              <input id=item0_7 name=item0_7 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_7>
+               registered (r)</label><br>
+              <input id=item0_8 name=item0_8 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_8>
+               trademark (tm)</label><br>
+              <input id=item0_9 name=item0_9 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_9>
+               параграф (p) / &#0167;</label><br>
+              <input id=item0_10 name=item0_10 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_10>
+               +- / &#0177;</label><br>
+              <input id=item0_11 name=item0_11 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_11>
+               ^C / &#0176;C, ^F / &#0176;F</label><br>
+              <input id=item0_12 name=item0_12 checked 
+               onclick="changeItem(0, this)" type=checkbox><label for=item0_12>
+               телефонные номера</label><br>
+      </td></tr></table>
+      </td>
+       <td class=br><img src=/z.gif width=1 height=1 alt="" border=0></td>
+
+     <td width=34% align=center valign=top>
+      <div align=center class=sectionTitle>
+      <input id=group1 name=group1 
+       type=checkbox onclick="changeGroup(1)"><label for=group1>
+       Макросы
+      </label></div>
+      <table align=center cellspacing=0 cellpadding=0 border=0><tr><td nowrap>
+      
+              <input id=item1_0 name=item1_0
+               onclick="changeItem(1, this)" type=checkbox><label for=item1_0>
+               разбиение на абзацы по &lt;//></label><br><img src=/z.gif width=40 height=5 border=0 alt=''><strong>&lt;P <input type=text id=paragraphAlign name=paragraphAlign value='align=justify'>&gt;</strong><br><img src=/z.gif width=40 height=5 border=0 alt=''><br>
+              <input id=item1_1 name=item1_1 checked 
+               onclick="changeItem(1, this)" type=checkbox><label for=item1_1>
+               красная строка по <->, <--><br><img src=/z.gif width=40 height=5 border=0 alt=''></label><br>
+              <input id=item1_2 name=item1_2 checked 
+               onclick="changeItem(1, this)" type=checkbox><label for=item1_2>
+               авто-<u>mailto:ttl@xxx.ru</u></label><br>
+              <input id=item1_3 name=item1_3 checked 
+               onclick="changeItem(1, this)" type=checkbox><label for=item1_3>
+               авто-<u>http://www.ttl.ru</u></label><br><img src=/z.gif width=40 height=5 border=0 alt=''><input type=checkbox id=skipHTTP name=skipHTTP checked onclick="parse()"><label for=skipHTTP>упрощенный формат</label></strong><br><img src=/z.gif width=40 height=5 border=0 alt=''><br>
+              <input id=item1_4 name=item1_4
+               onclick="changeItem(1, this)" type=checkbox><label for=item1_4>
+               разбиение на строки огранич. длины</label><br><img src=/z.gif width=40 height=5 border=0 alt=''>(длиной не более <input type=text id=fixedSize name=fixedSize value='80' size=2>)<br><img src=/z.gif width=40 height=5 border=0 alt=''><br>
+      </td></tr></table>
+      </td>
+       <td class=br><img src=/z.gif width=1 height=1 alt="" border=0></td>
+
+     <td width=34% align=left valign=top>
+      <div align=center class=sectionTitle>
+      <input id=group2 name=group2 
+       type=checkbox onclick="changeGroup(2)"><label for=group2>
+       Эвристики
+      </label></div>
+      <table align=center cellspacing=0 cellpadding=0 border=0><tr><td nowrap>
+      
+              <input id=item2_0 name=item2_0
+               onclick="changeItem(2, this)" type=checkbox><label for=item2_0>
+               переводы строк</label><br>
+              <input id=item2_1 name=item2_1 checked 
+               onclick="changeItem(2, this)" type=checkbox><label for=item2_1>
+               двойные переводы строк</label><br>
+              <input id=item2_2 name=item2_2 checked 
+               onclick="changeItem(2, this)" type=checkbox><label for=item2_2>
+               предлоги и &amp;nbsp;</label><br>
+              <input id=item2_3 name=item2_3 checked 
+               onclick="changeItem(2, this)" type=checkbox><label for=item2_3>
+               дефисы и &amp;nbsp;</label><br>
+              <input id=item2_4 name=item2_4 checked 
+               onclick="changeItem(2, this)" type=checkbox><label for=item2_4>
+               запятые и пробелы</label><br>
+              <input id=item2_5 name=item2_5
+               onclick="changeItem(2, this)" type=checkbox><label for=item2_5>
+               запрет тэгов HTML</label><br>
+            <img src=/z.gif width=1 height=5 border=0 alt=""><hr size=1>
+            <span  style="color:#666666">
+            Нажмите <strong>Процесс</strong><br> 
+            для применения настроек<br>
+            <small>
+             <input type=checkbox id=autoApply name=autoApply onclick="if (this.checked) parse()" checked><label for=autoApply>автоприменение изменений</label>
+             <br>
+             <input type=checkbox id=autoClick name=autoClick onclick="if (this.checked) checkparse()"><label for=autoClick>коррекция &laquo;на лету&raquo;</label>
+            </small>
+            </span>
+            
+      </td></tr></table>
+      </td>
+        </tr></table>
+  
+    <hr size=1>
+  </td>
+ </tr>
+ <tr>
+  <td width=50% valign=top height=100%>
+   <textarea name=t_input id=t_input style='font:small Times;width:100%;height:100%' onkeyup="checkparse()"></textarea>
+  </td>
+  <td width=1><img src=/z.gif width=1 height=200></td>
+  <td width=50%>
+   <table border=0 width=100% cellspacing=10 cellpadding=0>
+   <tr><td id=resultTag>
+    <div align=center style='color:#666666'>
+     Здесь появится набранный вами текст, <br>когда вы нажмёте кнопку <strong>Процесс</strong>.
+     <br><br>
+     Если результат вас устроит, жмите <em>Вставить обратно</em>, и HTML-код, необходимый
+     для воссоздания результата, скопируется в поле ввода, откуда вы сможете его легко забрать.
+     <br><br>
+     <small>
+     Инструмент предназначен для Internet Explorer и личных нужд.  <br>
+     Обработка текста производится на стороне клиента.<br>
+     Ваши тексты не попадают на наш сервер (а жаль, может быть).<br>
+     </small>
+    </div>
+   </td></tr>
+   </table>
+  </td><div id=hiddenResultTag></div>
+ </tr>
+ <tr>
+  <td width=50% valign=top align=right>
+   <input type=button name=processBtn value="Процесс &raquo;" onclick = "parse()"
+    style ="background:#c0eec0;">
+  </td>
+  <td width=1><img src=/z.gif width=1 height=1></td>
+  <td width=50% align=right>
+   <input type=button name=processBtn1 disabled value="&laquo; вставить обратно"  onclick = "putBack()"
+    style ="background:#dddddd;border-color:#ffffff">
+   <input type=button name=processBtn2 disabled title="(буфер обмена пуст)" value="скопировать в буфер &raquo;"  onclick = "copyToClipboard()"
+    style ="background:#dddddd;border-color:#ffffff">
+  </td>
+ </tr>
+</form>
+</table>
+<hr size=1 style="margin:0">
+<table cellspacing=0 cellpadding=0 width=100% border=0>
+<tr>
+ <td width=100% >
+   
+   <div style="padding-left:10px">
+    Дарвинизм &#0151; тупиковая ветвь эволюции!
+    <span style="color:#666666"><small>&copy;2002</small> <a href="/typografica">pixel&#0149;apes</a></span>
+   </div>
+ </td>
+ <td width=100% align=right>
+   <small><a href="info/">Описание&nbsp;настроек</a></small>&nbsp;&nbsp;
+ </td>
+</tr>
+</table>
+</body>
+
+

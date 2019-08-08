@@ -1,0 +1,7 @@
+/.idea
+/templates_c/*.php
+/app/server_production.php
+/www/siteditor/images/*.gif
+/www/backup
+/www/screenshots
+/www/siteditor/tpl_c
